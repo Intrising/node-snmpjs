@@ -105,10 +105,8 @@ content
 			pdu: $2
 		};
 	}}
-	| v3_header v3_sec v3_pdu {{
-		throw new RangeError('SNMPv3 is not supported yet');
-	}}
 	;
+
 
 v3_header
 	: 'SEQUENCE' integer integer string integer
