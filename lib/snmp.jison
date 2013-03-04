@@ -93,7 +93,7 @@
 message
 	: 'SEQUENCE' integer content {{
 		var msg = yy.message.createMessage({ version: $2,
-		    community: $3.community, pdu: $3.pdu });
+			community: $3.community, pdu: $3.pdu });
 		yy.setContent(msg);
 	}}
 	;
@@ -105,30 +105,70 @@ content
 			pdu: $2
 		};
 	}}
+	| v3_header v3_sec v3_pdu {{
+		$$ = {
+			community: '',
+			pdu: $3.pdu
+		};
+		$$.pdu.v3 = {
+			header: $1,
+			sec: $2,
+			context: $3.context
+        };
+	}}
 	;
-
 
 v3_header
-	: 'SEQUENCE' integer integer string integer
+	: 'SEQUENCE' integer integer string integer {{
+		$$ = {
+			id: $2,
+			maxsize: $3,
+			flags: $4,
+			secmodel: $5
+		};
+	}}
 	;
 
+v3_usmparms
+    : 'SEQUENCE' string integer integer string string string {{
+		$$ = {
+			engineid: $2,
+			boots: $3,
+			time: $4,
+			user: $5,
+			authparam: $6,
+			privparam: $7
+		};
+	}}
+	;
 v3_sec
-	: string
+	: string {{
+		$$ = $1;
+	}}
 	;
 
 v3_pdu
-	: scoped_pdu
-	| string
+	: scoped_pdu {{
+		$$ = $1;
+	}}
 	;
 
+
 scoped_pdu
-	: 'SEQUENCE' string string pdu
+	: 'SEQUENCE' string string pdu{{
+		$$ = {
+			context: {
+				engineID: $2,
+				name: $3
+			},
+			pdu: $4
+		};
+	}}
 	;
 
 pdu
 	: std_pdu_tag integer integer integer varbind_list {{
-		$$ = yy.pdu.createPDU({ op: $1, request_id: $2,
-		    varbinds: $5 });
+		$$ = yy.pdu.createPDU({ op: $1, request_id: $2, varbinds: $5 });
 		$$.error_status = $3;
 		$$.error_index = $4;
 	}}
@@ -162,7 +202,8 @@ varbind_list
 	: 'SEQUENCE' varbinds {{
 		$$ = $2;
 	}}
-	|
+	| 'SEQUENCE' {{
+	}}
 	;
 
 varbinds
