@@ -17,7 +17,7 @@
 	"dependencies": {
 		"jison": "0.3",
 		"asn1": "https://github.com/changtimwu/node-asn1/tarball/master",
-		"bunyan": "~0.18",
+		"bunyan": "~0.6",
 		"dtrace-provider": "~0.2"
 	},
 	"devDependencies": {
